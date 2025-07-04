@@ -1,13 +1,12 @@
 import asyncio
 from sqlalchemy import create_engine, Connection, Engine, text
-import pendulum as pend
+import pendulum 
 from typing import Optional, Any
 from _limits import __safe_threading_limit
 from _configs import BridgeConfigs
 from source_extractor import QueryReader, engine_creator, generate_data
 from pathlib import Path
 from json import dump
-
 
 SAFE_THREADING_LIMIT = __safe_threading_limit()
 
@@ -19,8 +18,6 @@ def _generate_semaphore(limit: int = SAFE_THREADING_LIMIT) -> asyncio.Semaphore:
 async def main():
     semaphore = _generate_semaphore()
     pass    
-
-
 
 if __name__ == "__main__":
     source_1 = SOURCE_EXTRACTION_CONFIG["dev"]
