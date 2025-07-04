@@ -10,7 +10,10 @@ wheels/
 .venv
 
 # docs hidden
-docs/mail
+docs/dimitris_mail
 
 # testing output
 test/dev
+
+# output data
+output

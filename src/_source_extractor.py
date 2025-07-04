@@ -2,10 +2,12 @@ import asyncio
 from sqlalchemy import create_engine, Connection, Engine, text
 import pendulum as pend
 from typing import Optional, Any
-from utils.limits import __safe_threading_limit
-from utils.configs import BridgeConfigs
-from utils.query_reader import QueryReader
+from _limits import __safe_threading_limit
+from _configs import BridgeConfigs
+from source_extractor import QueryReader, engine_creator, generate_data
 from pathlib import Path
+from json import dump
+
 
 SAFE_THREADING_LIMIT = __safe_threading_limit()
 
@@ -18,41 +20,15 @@ async def main():
     semaphore = _generate_semaphore()
     pass    
 
-def _get_configs():
-    pass
 
-def _generate_engines(connection_string: str) -> Engine:
-    return create_engine(url = connection_string)
-
-def _generate_queries(query_alias: str) -> str:
-    return QueryReader().read_source_extraction(query_alias) #type: ignore
-
-def _generate_data(engine: Engine, query: str, execution_options_kwargs: Optional[dict[str, Any]])->Optional[dict[str,Any]]:
-    if execution_options_kwargs is not None:
-        try:
-            with engine.connect() as _conn:
-                result = _conn.execution_options(**execution_options_kwargs).exec_driver_sql(statement=query)
-        
-        except Exception as SqlError:
-            print(SqlError)
-
-        else:
-            columns = [key.lower() for key in result.keys()]
-            rows = result.fetchall()
-            return {"columns":columns, "rows":rows}
-    else:
-        try:
-            with engine.connect() as _conn:
-                result = _conn.exec_driver_sql(statement=query)
-        
-        except Exception as SqlError:
-            print(SqlError)
-
-        else:
-            columns = [key.lower() for key in result.keys()]
-            rows = result.fetchall()
-            return {"columns":columns, "rows":rows}
 
 if __name__ == "__main__":
-    for column, items in SOURCE_EXTRACTION_CONFIG.items():
-        print(column, items["connection_string"], items["query_alias"])
+    source_1 = SOURCE_EXTRACTION_CONFIG["dev"]
+    print(query := QueryReader().read_source_extraction(source_1["query_alias"]))
+    print(engine := engine_creator(source_1["connection_string"],))
+    sql_result = generate_data(engine,query).test_pyarrow_table()
+    _path = Path.cwd().joinpath("output")
+    _path.mkdir(exist_ok=True)
+    import daft
+    
+    print(daft.from_arrow(sql_result))

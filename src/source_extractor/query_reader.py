@@ -26,7 +26,7 @@ class QueryReader:
         else:
             raise Exception(f"An unspecified error has occured during the initialization of {self.__class__}")
         
-    def read_source_extraction(self, query_alias: str)->Optional[str]:
+    def read_source_extraction(self, query_alias: str)->str: #type: ignore
         if isinstance(query_alias, str):
             source_extractor_file = self.query_home_folder.joinpath("source_extractor").joinpath(f"{query_alias}.sql") # type: ignore
             try:

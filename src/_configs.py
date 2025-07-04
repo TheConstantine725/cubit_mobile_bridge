@@ -13,7 +13,7 @@ class BridgeConfigs:
         self.extraction_config_path = self.__create_path(source_extraction_config_path)
         self.api_config_path = self.__create_path(api_config_path)
 
-    def __create_path(self, pathlike: Any) -> Optional[Path]:
+    def __create_path(self, pathlike: Union[str,Path],) -> Optional[Path]:
         if isinstance(pathlike, str):
             try:
                 _final_path = Path(pathlike)
@@ -31,7 +31,7 @@ class BridgeConfigs:
             raise Exception(f"General Error with the initialization of the {self.__class__}")
 
 
-    def generate_extraction_config(self,) -> dict:
+    def generate_extraction_config(self,) -> dict[str, Any]:
         if isinstance(self.extraction_config_path, Path):
             with self.extraction_config_path.open(mode = "r", encoding= "utf-8") as _reader:
                 return yaml.safe_load(_reader)
