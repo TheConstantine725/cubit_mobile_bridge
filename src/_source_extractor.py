@@ -4,7 +4,7 @@ import pendulum
 from typing import Optional, Any
 from _limits import __safe_threading_limit
 from _configs import BridgeConfigs
-from source_extractor import QueryReader, engine_creator, generate_data
+from source_extractor import QueryReader, engine_creator, generate_source_data
 from pathlib import Path
 from json import dump
 
@@ -23,7 +23,7 @@ if __name__ == "__main__":
     source_1 = SOURCE_EXTRACTION_CONFIG["dev"]
     print(query := QueryReader().read_source_extraction(source_1["query_alias"]))
     print(engine := engine_creator(source_1["connection_string"],))
-    sql_result = generate_data(engine,query).test_pyarrow_table()
+    sql_result = generate_source_data(engine,query).test_pyarrow_table()
     _path = Path.cwd().joinpath("output")
     _path.mkdir(exist_ok=True)
     import daft

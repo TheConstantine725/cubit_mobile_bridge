@@ -7,32 +7,40 @@ TRANSFROMATION_FORMATS = Literal["pyarrow","json"]
 class SqlResult:
 
     def __init__(self, cursor_result: CursorResult) -> None:
-        self.column_keys: Sequence[str]= [key.lower() for key in cursor_result.keys()]
-        self.rows: Generator[Sequence[Row[Any]]] = self.__generate_results(cursor_result)
+        self.cursor_result = cursor_result
+       
+    @property
+    def __generate_rows(self,) -> Generator[Sequence[Row[Any]], Any, None]:
+        yield from self.cursor_result
+    
+    @property
+    def __generate_keys(self,) -> Sequence[str]:
+        return [key.lower() for key in self.cursor_result.keys()]
 
-    def __generate_results(self, _cursor_res: CursorResult) -> Generator[Sequence[Row[Any]]]:
-        yield _cursor_res.fetchall()
 
     def transpose_to_json(self,) -> list[dict[str,Any]]:
         result = []
 
-        for row in self.rows:
+        for row in self.__generate_rows:
             temp = {}
-            for i, key in enumerate(self.column_keys):
+            for i, key in enumerate(self.__generate_keys):
                 temp[key] = row[i]
             result.append(temp)
 
         return result
 
-    def test_pyarrow_table(self,)->pyarrow.Table:
-        result = {}
-        for i, column_name in enumerate(self.column_keys):
-            array = []
-            for row in self.rows:
-                array.append(row[i])
-            result[column_name] = pyarrow.array(array)
-        
-        return pyarrow.table(result)
+    def test_pyarrow_table(self,)->Any:
+        _pydict = {}
+        for i, column in enumerate(self.__generate_keys):
+            temp_pylist = []
+            for r in self.__generate_rows:
+                temp_pylist.append(r)
+
+            _pydict[column] = temp_pylist
+                
+            print(temp_pylist)
+
+
 
 
 def generate_source_data(engine: Engine,
@@ -47,16 +55,16 @@ def generate_source_data(engine: Engine,
         except Exception as SqlError:
             print(f"There was an error in the execution of the SQL Query.\n{'='*40}\n{SqlError}\n{'='*40}")
         else:
-            return SqlResult(result)
+            return transform_final_data(SqlResult(result), extraction_format)
 
     elif isinstance(execution_options_kwargs, dict):
         try:
             with engine.connect() as _conn:
                 result = _conn.execution_options(**execution_options_kwargs).exec_driver_sql(statement=query)
         except Exception as SqlError:
-            print(f"There was an error in the execution of the SQL Query.\n{'='*40}\n{SqlError}\n{'='*40}")
+            print(f"There was an error in the execution of the SQL Query.\n{'='*40}\n{repr(SqlError)}\n{'='*40}")
         else:
-            return SqlResult(result)
+            return transform_final_data(SqlResult(result), extraction_format)
     else:
         raise ValueError(f"Cannot assign {SqlResult:=}")
     
