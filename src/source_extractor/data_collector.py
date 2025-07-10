@@ -1,12 +1,17 @@
-from sqlalchemy import Engine, Connection, Row
-from typing import Any, Optional, Sequence, Self, Iterable
+from sqlalchemy import Engine, Connection, Row, CursorResult
+from typing import Any, Optional, Sequence, Self, Iterable, Generator, Literal, Union
 import pyarrow
+
+TRANSFROMATION_FORMATS = Literal["pyarrow","json"]
 
 class SqlResult:
 
-    def __init__(self, column_keys: Iterable[str], rows: Sequence[Row[Any]]) -> None:
-        self.column_keys = [column_name.lower() for column_name in column_keys]
-        self.rows = rows
+    def __init__(self, cursor_result: CursorResult) -> None:
+        self.column_keys: Sequence[str]= [key.lower() for key in cursor_result.keys()]
+        self.rows: Generator[Sequence[Row[Any]]] = self.__generate_results(cursor_result)
+
+    def __generate_results(self, _cursor_res: CursorResult) -> Generator[Sequence[Row[Any]]]:
+        yield _cursor_res.fetchall()
 
     def transpose_to_json(self,) -> list[dict[str,Any]]:
         result = []
@@ -30,9 +35,11 @@ class SqlResult:
         return pyarrow.table(result)
 
 
-def generate_data(engine: Engine,
+def generate_source_data(engine: Engine,
                   query: str,*,
-                  execution_options_kwargs: Optional[dict[str, Any]] = None) -> Optional[SqlResult]:
+                  execution_options_kwargs: Optional[dict[str, Any]] = None,
+                  extraction_format: Literal["pyarrow", "json"]
+                  ) -> Optional[SqlResult]:
     if execution_options_kwargs is None:
         try:
             with engine.connect() as _conn:
@@ -40,7 +47,7 @@ def generate_data(engine: Engine,
         except Exception as SqlError:
             print(f"There was an error in the execution of the SQL Query.\n{'='*40}\n{SqlError}\n{'='*40}")
         else:
-            return SqlResult(result.keys(), result.fetchall())
+            return SqlResult(result)
 
     elif isinstance(execution_options_kwargs, dict):
         try:
@@ -49,6 +56,18 @@ def generate_data(engine: Engine,
         except Exception as SqlError:
             print(f"There was an error in the execution of the SQL Query.\n{'='*40}\n{SqlError}\n{'='*40}")
         else:
-            return SqlResult(result.keys(), result.fetchall())
+            return SqlResult(result)
     else:
         raise ValueError(f"Cannot assign {SqlResult:=}")
+    
+def transform_final_data(source_data: SqlResult, 
+                         format_transformation: TRANSFROMATION_FORMATS) -> Union[list[dict[str,Any]], pyarrow.Table, None]:
+    if format_transformation == "pyarrow":
+        return source_data.test_pyarrow_table()
+    elif format_transformation == "json":
+        return source_data.transpose_to_json()
+    else:
+        raise ValueError("this transformation format is not valid")
+
+if __name__ == "__main__":
+    pass

@@ -15,7 +15,7 @@ class QueryReader:
                 final_path = Path(pathlike)
             except Exception as TransformingQueriesHomePathError:
                 print("An error Occured during the initialization of the QueryReader Class, when setting the query homepath folder path.\n",
-                      f"{'-'*40}\n{TransformingQueriesHomePathError:=}\n{'='*40}",sep = None)
+                      f"{'-'*40}\n{repr(TransformingQueriesHomePathError):=}\n{'='*40}",sep = None)
             else:
                 return final_path
         elif isinstance(pathlike, Path):
@@ -32,8 +32,12 @@ class QueryReader:
             try:
                 with source_extractor_file.open(mode = "r", encoding="utf-8") as query_reader:
                     final_query = query_reader.read()
-            except IOError:
+            except Exception as IOerror:
+                print("="*40)
+                repr(IOerror)
+                print("="*40)
                 print(f"There was an error while reading the {source_extractor_file.as_posix():=}")
+                print("="*40)
             else:
                 return final_query
             

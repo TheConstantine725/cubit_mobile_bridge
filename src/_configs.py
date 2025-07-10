@@ -18,7 +18,7 @@ class BridgeConfigs:
             try:
                 _final_path = Path(pathlike)
             except Exception as PathlikeObjectError:
-                print(f"There was an error with {pathlike:=}\n{'='*40}\n{PathlikeObjectError}\n{'='*40}")
+                print(f"There was an error with {pathlike:=}\n{'='*40}\n{repr(PathlikeObjectError)}\n{'='*40}")
             else:
                 return _final_path
         elif isinstance(pathlike, Path):
