@@ -58,7 +58,7 @@ def generate_source_data(engine: Engine,
             with engine.connect() as _conn:
                 result = _conn.execution_options(**execution_options_kwargs).exec_driver_sql(statement=query)
         except Exception as SqlError:
-            print(f"There was an error in the execution of the SQL Query.\n{'='*40}\n{SqlError}\n{'='*40}")
+            print(f"There was an error in the execution of the SQL Query.\n{'='*40}\n{repr(SqlError)}\n{'='*40}")
         else:
             return transform_final_data(SqlResult(result), extraction_format)
     else:
