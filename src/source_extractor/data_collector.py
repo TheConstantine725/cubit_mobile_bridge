@@ -28,7 +28,7 @@ class SqlResult:
             result.append(temp)
         return result
 
-    def test_pyarrow_table(self,)-> Any:
+    def transpose_to_pyarrow(self,)-> Any:
         __base_pydict = {col:[] for col in self.column_keys}
         for row in self.rows:
             for col, r in zip(self.column_keys, row):
@@ -37,11 +37,6 @@ class SqlResult:
         for col_name, col_data in __base_pydict.items():
             __base_pydict[col_name] = pyarrow.array(np.array(col_data))
         return pyarrow.table(__base_pydict)
-        
-        
-
-                
-            
 
 
 def generate_source_data(engine: Engine,
@@ -72,7 +67,7 @@ def generate_source_data(engine: Engine,
 def transform_final_data(source_data: SqlResult, 
                          format_transformation: TRANSFROMATION_FORMATS) -> Union[list[dict[str,Any]], pyarrow.Table, None]:
     if format_transformation == "pyarrow":
-        return source_data.test_pyarrow_table()
+        return source_data.transpose_to_pyarrow()
     elif format_transformation == "json":
         return source_data.transpose_to_json()
     else:
