@@ -12,7 +12,6 @@ class SqlResult:
     def __init__(self, cursor_result: CursorResult) -> None:
         self.column_keys: Sequence[str]= [key.lower() for key in cursor_result.keys()]
         self.rows: Generator[Sequence[Row[Any]]] = self.__generate_results(cursor_result)
-        # self.__base_pydict = 
 
 
     def __generate_results(self, _cursor_res: CursorResult) -> Generator[Sequence[Row[Any]],Any, None]:
