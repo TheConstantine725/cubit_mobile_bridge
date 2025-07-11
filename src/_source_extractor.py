@@ -6,7 +6,7 @@ from pathlib import Path
 from json import dump
 from ._limits import __safe_threading_limit
 from ._configs import BridgeConfigs
-from .source_extractor import QueryReader, engine_creator, generate_source_data, transform_final_data
+from .source_extractor import QueryReader, engine_creator, generate_source_data
 
 SAFE_THREADING_LIMIT = __safe_threading_limit()
 
@@ -25,5 +25,5 @@ def main():
     (query := QueryReader().read_source_extraction(source_1["query_alias"]))
     (engine := engine_creator(source_1["connection_string"],))
     print("\n\n")
-    sql_result = generate_source_data(engine,query, extraction_format="pyarrow")
+    sql_result = generate_source_data(engine,query, extraction_format="json")
     return sql_result 
