@@ -14,6 +14,7 @@ docs/dimitris_mail
 
 # testing output
 test/dev
+tester.py
 
 # output data
 output
