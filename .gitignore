@@ -9,9 +9,6 @@ wheels/
 # Virtual environments
 .venv
 
-# docs hidden
-docs/dimitris_mail
-
 # testing output
 test/dev
 tester.py
@@ -19,4 +16,6 @@ tester.py
 # output data
 output
 
+# Archive & Proto-Development
 .dev
+.archive
