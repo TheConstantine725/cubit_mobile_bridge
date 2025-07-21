@@ -16,7 +16,7 @@ def _generate_semaphore(limit: int = SAFE_THREADING_LIMIT) -> asyncio.Semaphore:
     return asyncio.Semaphore(limit)
 
 # async def main():
-#     _generate_semaphore() #type: ignore
+#     _generate_semaphore() 
 #     pass    
 
 
