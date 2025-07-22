@@ -1,0 +1,4 @@
+dev:
+  query: "S:/HO/IT/__analytics_development/cubit_mobile_bridge/source_extractor_queries/dev.sql"
+  source_connection: "S:/HO/IT/__analytics_development/cubit_mobile_bridge/config/extraction_config.yaml"
+  api_endpoint: "S:/HO/IT/__analytics_development/cubit_mobile_bridge/config/api_config.yaml"
